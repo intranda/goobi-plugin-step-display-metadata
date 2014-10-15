@@ -5,12 +5,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.goobi.beans.Process;
 import org.goobi.beans.Step;
+import org.goobi.production.cli.helper.StringPair;
 import org.goobi.production.enums.PluginGuiType;
 import org.goobi.production.enums.PluginType;
 import org.goobi.production.enums.StepReturnValue;
@@ -45,7 +44,9 @@ public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
     private Step step;
     private String returnPath;
     private Process process;
-    private List<String> metadataTypes;
+    private List<String> metadataTypes = new ArrayList<String>();
+    private List<StringPair> metadata = new ArrayList<StringPair>();
+
 
     private Map<String, String> metadataMap = new HashMap<>();
 
@@ -59,10 +60,16 @@ public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
         return PLUGIN_NAME;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void initialize(Step step, String returnPath) {
-        metadataTypes = ConfigPlugins.getPluginConfig(this).getList("metadatalist.metadata");
+        int numberOfMetadata = ConfigPlugins.getPluginConfig(this).getList("metadatalist.metadata").size();
+        for (int i = 0;  i < numberOfMetadata; i++) {
+            String metadataName = ConfigPlugins.getPluginConfig(this).getString("metadatalist.metadata(" + i + ")");
+            String prefix = ConfigPlugins.getPluginConfig(this).getString("metadatalist.metadata(" + i + ")[@prefix]", "");
+            metadata.add(new StringPair(metadataName, prefix));
+            metadataTypes.add(metadataName);
+        }
+//        metadataTypes = ConfigPlugins.getPluginConfig(this).getList("metadatalist.metadata");
 
         this.step = step;
         this.returnPath = returnPath;
@@ -79,9 +86,9 @@ public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
                 logical = logical.getAllChildren().get(0);
             }
 
-            for (String metadataType : metadataTypes) {
+            for (StringPair currentMetadata : metadata) {
 
-                MetadataType mdt = process.getRegelsatz().getPreferences().getMetadataTypeByName(metadataType);
+                MetadataType mdt = process.getRegelsatz().getPreferences().getMetadataTypeByName(currentMetadata.getOne());
                 String values = "";
                 if (mdt != null) {
                     if (mdt.getIsPerson()) {
@@ -108,7 +115,7 @@ public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
 
                         }
                     }
-                    metadataMap.put(mdt.getName(), values);
+                    metadataMap.put(mdt.getName(), currentMetadata.getTwo() + values);
                 }
             }
 
@@ -152,6 +159,10 @@ public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
 
     public Map<String, String> getMetadataMap() {
         return metadataMap;
+    }
+    
+    public void setMetadataMap(Map<String, String> metadataMap) {
+        this.metadataMap = metadataMap;
     }
     
     public List<String> getMetadataTypes() {
