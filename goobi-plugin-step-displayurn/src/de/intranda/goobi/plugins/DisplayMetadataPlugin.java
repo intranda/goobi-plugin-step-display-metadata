@@ -45,7 +45,7 @@ public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
     private String returnPath;
     private Process process;
     private List<String> metadataTypes = new ArrayList<String>();
-    private List<StringPair> metadata = new ArrayList<StringPair>();
+    private List<MetadataConfiguration> metadata = new ArrayList<MetadataConfiguration>();
 
 
     private Map<String, String> metadataMap = new HashMap<>();
@@ -66,7 +66,8 @@ public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
         for (int i = 0;  i < numberOfMetadata; i++) {
             String metadataName = ConfigPlugins.getPluginConfig(this).getString("metadatalist.metadata(" + i + ")");
             String prefix = ConfigPlugins.getPluginConfig(this).getString("metadatalist.metadata(" + i + ")[@prefix]", "");
-            metadata.add(new StringPair(metadataName, prefix));
+            String suffix = ConfigPlugins.getPluginConfig(this).getString("metadatalist.metadata(" + i + ")[@suffix]", "");
+            metadata.add(new MetadataConfiguration(metadataName, prefix, suffix));
             metadataTypes.add(metadataName);
         }
 //        metadataTypes = ConfigPlugins.getPluginConfig(this).getList("metadatalist.metadata");
@@ -86,9 +87,9 @@ public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
                 logical = logical.getAllChildren().get(0);
             }
 
-            for (StringPair currentMetadata : metadata) {
+            for (MetadataConfiguration currentMetadata : metadata) {
 
-                MetadataType mdt = process.getRegelsatz().getPreferences().getMetadataTypeByName(currentMetadata.getOne());
+                MetadataType mdt = process.getRegelsatz().getPreferences().getMetadataTypeByName(currentMetadata.getMetadataName());
                 String values = "";
                 if (mdt != null) {
                     if (mdt.getIsPerson()) {
@@ -115,7 +116,7 @@ public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
 
                         }
                     }
-                    metadataMap.put(mdt.getName(), currentMetadata.getTwo() + values);
+                    metadataMap.put(mdt.getName(), currentMetadata.getPrefix() + values + currentMetadata.getSuffix());
                 }
             }
 
