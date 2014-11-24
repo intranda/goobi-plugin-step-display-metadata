@@ -4,6 +4,6 @@
         <metadata>Author</metadata>
         <metadata>TitleDocMain</metadata>
         <metadata>_urn</metadata>
-        <metadata prefix="http://svdmzgoobiweb01.klassik-stiftung.de/viewer/epnresolver?id=">CatalogIDDigital</metadata>
+	<metadata prefix="http://svdmzgoobiweb01.klassik-stiftung.de/viewer/image/" suffix="/1/">CatalogIDDigital</metadata>
     </metadatalist>
 </config_plugin>
