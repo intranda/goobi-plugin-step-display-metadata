@@ -1,16 +1,20 @@
-<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:composite="http://java.sun.com/jsf/composite"
-    xmlns:f="http://java.sun.com/jsf/core" xmlns:h="http://java.sun.com/jsf/html">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:composite="http://java.sun.com/jsf/composite" xmlns:f="http://java.sun.com/jsf/core" xmlns:h="http://java.sun.com/jsf/html">
 
     <h:form>
 
         <hr />
-        <ui:repeat var="item" value="#{AktuelleSchritteForm.myPlugin.metadataTypes}">
-            <h:panelGrid columns="2">
-                <h:outputText value="#{msgs[item]}:" />
-                <h:outputText value="#{AktuelleSchritteForm.myPlugin.metadataMap[item]}" />
-            </h:panelGrid>
-        </ui:repeat>
-
+        <table>
+            <ui:repeat var="item" value="#{AktuelleSchritteForm.myPlugin.metadataTypes}">
+                <tr>
+                    <td>
+                        <h:outputText value="#{msgs[item]}:" />
+                    </td>
+                    <td>
+                        <h:outputText value="#{AktuelleSchritteForm.myPlugin.metadataMap[item]}" />
+                    </td>
+                </tr>
+            </ui:repeat>
+        </table>
         <hr />
 
 
