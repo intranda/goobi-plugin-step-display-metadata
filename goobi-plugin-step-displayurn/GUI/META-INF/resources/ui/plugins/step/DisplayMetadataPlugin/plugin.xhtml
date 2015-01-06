@@ -6,10 +6,10 @@
         <table>
             <ui:repeat var="item" value="#{AktuelleSchritteForm.myPlugin.metadataTypes}">
                 <tr>
-                    <td>
+                    <td align="right">
                         <h:outputText value="#{msgs[item]}:" />
                     </td>
-                    <td>
+                    <td style="padding-left: 5px">
                         <h:outputText value="#{AktuelleSchritteForm.myPlugin.metadataMap[item]}" />
                     </td>
                 </tr>
