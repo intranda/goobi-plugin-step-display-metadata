@@ -66,8 +66,9 @@ public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
             String metadataName = ConfigPlugins.getPluginConfig(this).getString("metadatalist.metadata(" + i + ")");
             String prefix = ConfigPlugins.getPluginConfig(this).getString("metadatalist.metadata(" + i + ")[@prefix]", "");
             String suffix = ConfigPlugins.getPluginConfig(this).getString("metadatalist.metadata(" + i + ")[@suffix]", "");
-            metadata.add(new MetadataConfiguration(metadataName, prefix, suffix));
-            metadataTypes.add(metadataName);
+            String key = ConfigPlugins.getPluginConfig(this).getString("metadatalist.metadata(" + i + ")[@key]", metadataName);
+            metadata.add(new MetadataConfiguration(metadataName, prefix, suffix, key));
+            metadataTypes.add(key);
         }
 //        metadataTypes = ConfigPlugins.getPluginConfig(this).getList("metadatalist.metadata");
 
@@ -115,7 +116,7 @@ public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
 
                         }
                     }
-                    metadataMap.put(mdt.getName(), currentMetadata.getPrefix() + values + currentMetadata.getSuffix());
+                    metadataMap.put(currentMetadata.getKey(), currentMetadata.getPrefix() + values + currentMetadata.getSuffix());
                 }
             }
 
