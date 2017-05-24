@@ -54,7 +54,7 @@ public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
         return PLUGIN_NAME;
     }
 
-    @Override
+    
     public String getDescription() {
         return PLUGIN_NAME;
     }
