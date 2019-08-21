@@ -31,7 +31,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 @PluginImplementation
 public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
 
-    private static final String PLUGIN_NAME = "DisplayMetadataPlugin";
+    private static final String PLUGIN_NAME = "intranda_step_displayMetadataPlugin";
 
     private static final Logger logger = Logger.getLogger(DisplayMetadataPlugin.class);
 
@@ -61,16 +61,16 @@ public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
 
     @Override
     public void initialize(Step step, String returnPath) {
-        int numberOfMetadata = ConfigPlugins.getPluginConfig(this).getList("metadatalist.metadata").size();
+        int numberOfMetadata = ConfigPlugins.getPluginConfig(PLUGIN_NAME).getList("metadatalist.metadata").size();
         for (int i = 0;  i < numberOfMetadata; i++) {
-            String metadataName = ConfigPlugins.getPluginConfig(this).getString("metadatalist.metadata(" + i + ")");
-            String prefix = ConfigPlugins.getPluginConfig(this).getString("metadatalist.metadata(" + i + ")[@prefix]", "");
-            String suffix = ConfigPlugins.getPluginConfig(this).getString("metadatalist.metadata(" + i + ")[@suffix]", "");
-            String key = ConfigPlugins.getPluginConfig(this).getString("metadatalist.metadata(" + i + ")[@key]", metadataName);
+            String metadataName = ConfigPlugins.getPluginConfig(PLUGIN_NAME).getString("metadatalist.metadata(" + i + ")");
+            String prefix = ConfigPlugins.getPluginConfig(PLUGIN_NAME).getString("metadatalist.metadata(" + i + ")[@prefix]", "");
+            String suffix = ConfigPlugins.getPluginConfig(PLUGIN_NAME).getString("metadatalist.metadata(" + i + ")[@suffix]", "");
+            String key = ConfigPlugins.getPluginConfig(PLUGIN_NAME).getString("metadatalist.metadata(" + i + ")[@key]", metadataName);
             metadata.add(new MetadataConfiguration(metadataName, prefix, suffix, key));
             metadataTypes.add(key);
         }
-//        metadataTypes = ConfigPlugins.getPluginConfig(this).getList("metadatalist.metadata");
+//        metadataTypes = ConfigPlugins.getPluginConfig(PLUGIN_NAME).getList("metadatalist.metadata");
 
         this.step = step;
         this.returnPath = returnPath;
