@@ -31,7 +31,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 @PluginImplementation
 public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
 
-    private static final String PLUGIN_NAME = "intranda_step_displayMetadataPlugin";
+    private static final String PLUGIN_NAME = "intranda_step_displayMetadata";
 
     private static final Logger logger = Logger.getLogger(DisplayMetadataPlugin.class);
 
