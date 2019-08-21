@@ -4,7 +4,7 @@
 	<artifactId>displaymetadata-gui</artifactId>
 	<version>1.0.0</version>
 	<properties>
-		<jar.name>plugin_intranda_step_displaymetadata-GUI</jar.name>
+		<jar.name>plugin_intranda_step_displayMetadata-GUI</jar.name>
 		<dest.folder>/opt/digiverso/goobi/plugins/GUI/</dest.folder>
 	</properties>
 	<parent>
