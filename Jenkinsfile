@@ -24,7 +24,7 @@ pipeline {
 
     stage('build') {
       steps {
-        sh 'mvn -f goobi-plugin-step-displayurn/pom.xml install'
+        sh 'mvn -f goobi-plugin-step-displaymetadata/pom.xml install'
         recordIssues enabledForFailure: true, aggregatingResults: true, tools: [java(), javaDoc()]
       }
     }
