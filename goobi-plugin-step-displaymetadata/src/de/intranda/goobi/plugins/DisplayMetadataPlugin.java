@@ -31,6 +31,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.configuration.SubnodeConfiguration;
+import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
+import org.apache.commons.configuration.tree.xpath.XPathExpressionEngine;
 import org.apache.log4j.Logger;
 import org.goobi.beans.Process;
 import org.goobi.beans.Step;
@@ -84,15 +88,51 @@ public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
 
     @Override
     public void initialize(Step step, String returnPath) {
-        int numberOfMetadata = ConfigPlugins.getPluginConfig(PLUGIN_NAME).getList("metadatalist.metadata").size();
-        for (int i = 0; i < numberOfMetadata; i++) {
-            String metadataName = ConfigPlugins.getPluginConfig(PLUGIN_NAME).getString("metadatalist.metadata(" + i + ")");
-            String prefix = ConfigPlugins.getPluginConfig(PLUGIN_NAME).getString("metadatalist.metadata(" + i + ")[@prefix]", "");
-            String suffix = ConfigPlugins.getPluginConfig(PLUGIN_NAME).getString("metadatalist.metadata(" + i + ")[@suffix]", "");
-            String key = ConfigPlugins.getPluginConfig(PLUGIN_NAME).getString("metadatalist.metadata(" + i + ")[@key]", metadataName);
+        String projectName = step.getProzess().getProjekt().getTitel();
+
+        XMLConfiguration xmlConfig = ConfigPlugins.getPluginConfig(PLUGIN_NAME);
+        xmlConfig.setExpressionEngine(new XPathExpressionEngine());
+        xmlConfig.setReloadingStrategy(new FileChangedReloadingStrategy());
+        SubnodeConfiguration myconfig = null;
+
+        // order of configuration is:
+        // 1.) project name and step name matches
+        // 2.) step name matches and project is *
+        // 3.) project name matches and step name is *
+        // 4.) project name and step name are *
+        try {
+            myconfig = xmlConfig.configurationAt("//config[./project = '" + projectName + "'][./step = '" + step.getTitel() + "']");
+        } catch (IllegalArgumentException e) {
+            try {
+                myconfig = xmlConfig.configurationAt("//config[./project = '*'][./step = '" + step.getTitel() + "']");
+            } catch (IllegalArgumentException e1) {
+                try {
+                    myconfig = xmlConfig.configurationAt("//config[./project = '" + projectName + "'][./step = '*']");
+                } catch (IllegalArgumentException e2) {
+                    myconfig = xmlConfig.configurationAt("//config[./project = '*'][./step = '*']");
+                }
+            }
+        }
+
+        List<SubnodeConfiguration> metadataConfiguration = myconfig.configurationsAt("/metadatalist/metadata");
+        for (SubnodeConfiguration sub : metadataConfiguration) {
+            String metadataName = sub.getString(".");
+            String prefix = sub.getString("./@prefix", "");
+            String suffix =  sub.getString("./@suffix", "");
+            String key = sub.getString("./@key", metadataName);
             metadata.add(new MetadataConfiguration(metadataName, prefix, suffix, key));
             metadataTypes.add(key);
         }
+        
+//        int numberOfMetadata = myconfig.getList("/metadatalist/metadata").size();
+//        for (int i = 0; i < numberOfMetadata; i++) {
+//            String metadataName = myconfig.getString("metadatalist.metadata(" + i + ")");
+//            String prefix = myconfig.getString("metadatalist.metadata(" + i + ")[@prefix]", "");
+//            String suffix = myconfig.getString("metadatalist.metadata(" + i + ")[@suffix]", "");
+//            String key =myconfig.getString("metadatalist.metadata(" + i + ")[@key]", metadataName);
+//            metadata.add(new MetadataConfiguration(metadataName, prefix, suffix, key));
+//            metadataTypes.add(key);
+//        }
         //        metadataTypes = ConfigPlugins.getPluginConfig(PLUGIN_NAME).getList("metadatalist.metadata");
 
         this.step = step;
