@@ -3,7 +3,7 @@ package de.intranda.goobi.plugins;
 /**
  * This file is part of a plugin for the Goobi Application - a Workflow tool for the support of mass digitization.
  * 
- * Visit the websites for more information. 
+ * Visit the websites for more information.
  *          - https://goobi.io
  *          - https://www.intranda.com
  *          - https://github.com/intranda/goobi
@@ -72,8 +72,8 @@ public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
     private Step step;
     private String returnPath;
     private Process process;
-    private List<String> metadataTypes = new ArrayList<String>();
-    private List<MetadataConfiguration> metadata = new ArrayList<MetadataConfiguration>();
+    private List<String> metadataTypes = new ArrayList<>();
+    private List<MetadataConfiguration> metadata = new ArrayList<>();
 
     private Map<String, String> metadataMap = new HashMap<>();
 
@@ -123,16 +123,16 @@ public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
             metadata.add(new MetadataConfiguration(metadataName, prefix, suffix, key));
             metadataTypes.add(key);
         }
-        
-//        int numberOfMetadata = myconfig.getList("/metadatalist/metadata").size();
-//        for (int i = 0; i < numberOfMetadata; i++) {
-//            String metadataName = myconfig.getString("metadatalist.metadata(" + i + ")");
-//            String prefix = myconfig.getString("metadatalist.metadata(" + i + ")[@prefix]", "");
-//            String suffix = myconfig.getString("metadatalist.metadata(" + i + ")[@suffix]", "");
-//            String key =myconfig.getString("metadatalist.metadata(" + i + ")[@key]", metadataName);
-//            metadata.add(new MetadataConfiguration(metadataName, prefix, suffix, key));
-//            metadataTypes.add(key);
-//        }
+
+        //        int numberOfMetadata = myconfig.getList("/metadatalist/metadata").size();
+        //        for (int i = 0; i < numberOfMetadata; i++) {
+        //            String metadataName = myconfig.getString("metadatalist.metadata(" + i + ")");
+        //            String prefix = myconfig.getString("metadatalist.metadata(" + i + ")[@prefix]", "");
+        //            String suffix = myconfig.getString("metadatalist.metadata(" + i + ")[@suffix]", "");
+        //            String key =myconfig.getString("metadatalist.metadata(" + i + ")[@key]", metadataName);
+        //            metadata.add(new MetadataConfiguration(metadataName, prefix, suffix, key));
+        //            metadataTypes.add(key);
+        //        }
         //        metadataTypes = ConfigPlugins.getPluginConfig(PLUGIN_NAME).getList("metadatalist.metadata");
 
         this.step = step;
@@ -213,12 +213,13 @@ public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
 
     @Override
     public PluginGuiType getPluginGuiType() {
+        //        return PluginGuiType.PART_AND_FULL;
         return PluginGuiType.PART;
     }
 
     @Override
     public String getPagePath() {
-        return null;
+        return "/uii/step_example_full.xhtml";
     }
 
     public Map<String, String> getMetadataMap() {

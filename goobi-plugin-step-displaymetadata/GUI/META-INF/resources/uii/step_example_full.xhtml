@@ -1,0 +1,93 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:o="http://omnifaces.org/ui"
+    xmlns:of="http://omnifaces.org/functions"
+    template="/uii/template/template.html"
+    xmlns:x="http://myfaces.apache.org/tomahawk"
+    xmlns:intranda="http://xmlns.jcp.org/jsf/composite/composites"
+    xmlns:p="http://primefaces.org/ui">
+
+    <ui:param
+        name="myPageTitle"
+        value="#{msgs.plugin}: #{msgs[AktuelleSchritteForm.myPlugin.title]}" />
+
+    <ui:define name="breadcrumb">
+        <intranda:breadcrumb
+            label="#{msgs.startseite}"
+            action="index"
+            navId="a0" />
+        <intranda:breadcrumb
+            label="#{msgs.aktuelleSchritte}"
+            action="#{AktuelleSchritteForm.paginator.returnToPreviousPage}" />
+        <intranda:breadcrumb
+            label="#{AktuelleSchritteForm.mySchritt.prozess.titel}"
+            action="task_edit" />
+        <intranda:breadcrumb
+            label="#{myPageTitle}"
+            noSeparator="#{true}" />
+    </ui:define>
+
+    <ui:define name="info">
+    </ui:define>
+
+    <ui:define name="content">
+
+
+
+        <div class="row">
+            <div class="col-sm-12">
+                <!-- Box for process log -->
+                <h:form
+                    styleClass="form-vertical form-bordered"
+                    id="processLog">
+                    <div class="box thin-margin box-bordered">
+                        <div class="box-title">
+                            <h3>
+                                <i class="fa fa-bars" />
+                                <h:outputText value="#{AktuelleSchritteForm.mySchritt.prozess.titel}" />
+                            </h3>
+
+                        </div>
+                        <div class="box-content nopadding">
+                            <div
+                                data-start="bottom"
+                                data-visible="true"
+                                data-height="214"
+                                style="overflow: hidden; width: auto; height: 214px;">
+                               
+                               
+                                <table class="table table-bordered">
+                    <x:dataList var="item" value="#{AktuelleSchritteForm.myPlugin.metadataTypes}" styleClass="table table-bordered">
+                        <tr>
+                            <td align="right">
+                                <h:outputText value="#{msgs[item]}:" />
+                            </td>
+                            <td style="padding-left: 5px">
+                                <h:outputText value="#{AktuelleSchritteForm.myPlugin.metadataMap[item]}" />
+                            </td>
+                        </tr>
+                    </x:dataList>
+
+                </table>
+                                
+                                
+                            </div>
+
+                            
+                        </div>
+                    </div>
+                </h:form>
+                <!-- // Box for process log -->
+            </div>
+
+
+           
+        </div>
+
+    </ui:define>
+
+</ui:composition>
