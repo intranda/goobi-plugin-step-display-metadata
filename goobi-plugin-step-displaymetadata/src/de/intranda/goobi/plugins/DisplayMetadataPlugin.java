@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
@@ -114,8 +115,8 @@ public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
             }
         }
 
-        List<SubnodeConfiguration> metadataConfiguration = myconfig.configurationsAt("/metadatalist/metadata");
-        for (SubnodeConfiguration sub : metadataConfiguration) {
+        List<HierarchicalConfiguration> metadataConfiguration = myconfig.configurationsAt("/metadatalist/metadata");
+        for (HierarchicalConfiguration sub : metadataConfiguration) {
             String metadataName = sub.getString(".");
             String prefix = sub.getString("./@prefix", "");
             String suffix =  sub.getString("./@suffix", "");
