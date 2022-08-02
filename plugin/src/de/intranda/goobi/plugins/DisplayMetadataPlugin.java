@@ -46,7 +46,6 @@ import org.goobi.production.plugin.interfaces.IPlugin;
 import org.goobi.production.plugin.interfaces.IStepPlugin;
 
 import de.sub.goobi.config.ConfigPlugins;
-import de.sub.goobi.helper.exceptions.DAOException;
 import de.sub.goobi.helper.exceptions.SwapException;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import ugh.dl.DocStruct;
@@ -56,7 +55,6 @@ import ugh.dl.MetadataType;
 import ugh.dl.Person;
 import ugh.exceptions.PreferencesException;
 import ugh.exceptions.ReadException;
-import ugh.exceptions.WriteException;
 
 @PluginImplementation
 public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
@@ -119,7 +117,7 @@ public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
         for (HierarchicalConfiguration sub : metadataConfiguration) {
             String metadataName = sub.getString(".");
             String prefix = sub.getString("./@prefix", "");
-            String suffix =  sub.getString("./@suffix", "");
+            String suffix = sub.getString("./@suffix", "");
             String key = sub.getString("./@key", metadataName);
             metadata.add(new MetadataConfiguration(metadataName, prefix, suffix, key));
             metadataTypes.add(key);
@@ -184,7 +182,7 @@ public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
                 }
             }
 
-        } catch (ReadException | PreferencesException | SwapException | DAOException | WriteException | IOException | InterruptedException e) {
+        } catch (ReadException | PreferencesException | SwapException | IOException e) {
             logger.error(e);
             return false;
         }
