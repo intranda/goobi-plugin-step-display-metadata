@@ -8,13 +8,11 @@
     xmlns:of="http://omnifaces.org/functions"
     template="/uii/template/template.html"
     xmlns:x="http://myfaces.apache.org/tomahawk"
-    xmlns:intranda="http://xmlns.jcp.org/jsf/composite/composites"
+    xmlns:intranda="http://xmlns.jcp.org/jsf/composite/compositesPG"
     xmlns:p="http://primefaces.org/ui">
-
     <ui:param
         name="myPageTitle"
         value="#{msgs.plugin}: #{msgs[AktuelleSchritteForm.myPlugin.title]}" />
-
     <ui:define name="breadcrumb">
         <intranda:breadcrumb
             label="#{msgs.startseite}"
@@ -30,64 +28,38 @@
             label="#{myPageTitle}"
             noSeparator="#{true}" />
     </ui:define>
-
     <ui:define name="info">
     </ui:define>
-
     <ui:define name="content">
-
-
-
         <div class="row">
             <div class="col-sm-12">
                 <!-- Box for process log -->
-                <h:form
-                    styleClass="form-vertical form-bordered"
-                    id="processLog">
-                    <div class="box thin-margin box-bordered">
-                        <div class="box-title">
-                            <h3>
-                                <i class="fa fa-bars" />
-                                <h:outputText value="#{AktuelleSchritteForm.mySchritt.prozess.titel}" />
-                            </h3>
-
-                        </div>
-                        <div class="box-content nopadding">
-                            <div
-                                data-start="bottom"
-                                data-visible="true"
-                                data-height="214"
-                                style="overflow: hidden; width: auto; height: 214px;">
-                               
-                               
-                                <table class="table table-bordered">
-                    <x:dataList var="item" value="#{AktuelleSchritteForm.myPlugin.metadataTypes}" styleClass="table table-bordered">
-                        <tr>
-                            <td align="right">
-                                <h:outputText value="#{msgs[item]}:" />
-                            </td>
-                            <td style="padding-left: 5px">
-                                <h:outputText value="#{AktuelleSchritteForm.myPlugin.metadataMap[item]}" />
-                            </td>
-                        </tr>
-                    </x:dataList>
-
-                </table>
-                                
-                                
-                            </div>
-
-                            
-                        </div>
+                <intranda:box
+                    boxPadding="false"
+                    boxType="neutral"
+                    icon="fa fa-bars"
+                    title="#{AktuelleSchritteForm.mySchritt.prozess.titel}">
+                    <div
+                        data-start="bottom"
+                        data-visible="true"
+                        data-height="214"
+                        style="overflow: hidden; width: auto; height: 214px;">
+                        <table class="table table-bordered">
+                            <x:dataList var="item" value="#{AktuelleSchritteForm.myPlugin.metadataTypes}" styleClass="table table-bordered">
+                                <tr>
+                                    <td class="text-end">
+                                        <h:outputText value="#{msgs[item]}:" />
+                                    </td>
+                                    <td>
+                                        <h:outputText value="#{AktuelleSchritteForm.myPlugin.metadataMap[item]}" />
+                                    </td>
+                                </tr>
+                            </x:dataList>
+                        </table>
                     </div>
-                </h:form>
+                </intranda:box>
                 <!-- // Box for process log -->
             </div>
-
-
-           
         </div>
-
     </ui:define>
-
 </ui:composition>
