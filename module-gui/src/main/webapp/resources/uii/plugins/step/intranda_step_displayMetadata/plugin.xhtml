@@ -12,7 +12,7 @@
         icon="fa fa-upload"
         title="#{msgs.metadata}">
         <table class="table table-bordered">
-            <x:dataList var="item" value="#{AktuelleSchritteForm.myPlugin.metadataTypes}" styleClass="table table-bordered">
+            <ui:repeat var="item" value="#{AktuelleSchritteForm.myPlugin.metadataTypes}" styleClass="table table-bordered">
                 <tr>
                     <td class="text-end">
                         <h:outputText value="#{msgs[item]}:" />
@@ -21,7 +21,7 @@
                         <h:outputText value="#{AktuelleSchritteForm.myPlugin.metadataMap[item]}" />
                     </td>
                 </tr>
-            </x:dataList>
+            </ui:repeat>
         </table>
     </intranda:box>
 </ui:composition>

@@ -59,6 +59,8 @@ import ugh.exceptions.ReadException;
 @PluginImplementation
 public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
 
+    private static final long serialVersionUID = 8219186039584057484L;
+
     private static final String PLUGIN_NAME = "intranda_step_displayMetadata";
 
     private static final Logger logger = Logger.getLogger(DisplayMetadataPlugin.class);
@@ -72,16 +74,12 @@ public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
     private String returnPath;
     private Process process;
     private List<String> metadataTypes = new ArrayList<>();
-    private List<MetadataConfiguration> metadata = new ArrayList<>();
+    private transient List<MetadataConfiguration> metadata = new ArrayList<>();
 
     private Map<String, String> metadataMap = new HashMap<>();
 
     @Override
     public String getTitle() {
-        return PLUGIN_NAME;
-    }
-
-    public String getDescription() {
         return PLUGIN_NAME;
     }
 
@@ -122,17 +120,6 @@ public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
             metadata.add(new MetadataConfiguration(metadataName, prefix, suffix, key));
             metadataTypes.add(key);
         }
-
-        //        int numberOfMetadata = myconfig.getList("/metadatalist/metadata").size();
-        //        for (int i = 0; i < numberOfMetadata; i++) {
-        //            String metadataName = myconfig.getString("metadatalist.metadata(" + i + ")");
-        //            String prefix = myconfig.getString("metadatalist.metadata(" + i + ")[@prefix]", "");
-        //            String suffix = myconfig.getString("metadatalist.metadata(" + i + ")[@suffix]", "");
-        //            String key =myconfig.getString("metadatalist.metadata(" + i + ")[@key]", metadataName);
-        //            metadata.add(new MetadataConfiguration(metadataName, prefix, suffix, key));
-        //            metadataTypes.add(key);
-        //        }
-        //        metadataTypes = ConfigPlugins.getPluginConfig(PLUGIN_NAME).getList("metadatalist.metadata");
 
         this.step = step;
         this.returnPath = returnPath;
@@ -212,7 +199,6 @@ public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
 
     @Override
     public PluginGuiType getPluginGuiType() {
-        //        return PluginGuiType.PART_AND_FULL;
         return PluginGuiType.PART;
     }
 
