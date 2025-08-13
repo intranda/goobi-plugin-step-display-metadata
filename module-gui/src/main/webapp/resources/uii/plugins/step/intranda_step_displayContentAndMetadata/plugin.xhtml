@@ -1,0 +1,90 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:composite="http://java.sun.com/jsf/composite"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:intranda="http://xmlns.jcp.org/jsf/composite/composites"
+    xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+    xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+    xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:fragment rendered="#{AktuelleSchritteForm.myPlugin.displayMetadata}">
+        <intranda:box
+            boxType="neutral"
+            boxPadding="false"
+            icon="fa-book"
+            title="#{msgs.metadata}">
+            <table class="table table-bordered">
+                <ui:repeat var="item" value="#{AktuelleSchritteForm.myPlugin.metadataTypes}" styleClass="table table-hover table-width">
+                    <tr>
+                        <td class="text-end">
+                            <h:outputText value="#{msgs[item]}:" />
+                        </td>
+                        <td>
+                            <h:outputText value="#{AktuelleSchritteForm.myPlugin.metadataMap[item]}" />
+                        </td>
+                    </tr>
+                </ui:repeat>
+            </table>
+        </intranda:box>
+        <div class="m-4"></div>
+    </ui:fragment>
+    <ui:fragment rendered="#{AktuelleSchritteForm.myPlugin.displayContent}">
+        <intranda:box
+            boxType="primary"
+            boxPadding="true"
+            icon="fa-folder-open"
+            title="Files">
+            <h:form>
+                <ui:repeat
+                    var="folder"
+                    value="#{AktuelleSchritteForm.myPlugin.configuredFolder}">
+                    <div class="pb-4">
+                        <!--
+                        <h3>
+                            <h:outputText value="#{folder.foldername}" />
+                        </h3>
+                        -->
+                        <table class="table table-bordered table-striped">
+                            <tr>
+                                <th colspan="2">
+                                    <h:outputText value="#{folder.foldername}" />
+                                </th>
+                            </tr>
+
+                            <ui:repeat
+                                var="file"
+                                value="#{folder.files}"
+                                styleClass="table table-bordered"
+                                rowCountVar="count"
+                                rowIndexVar="index">
+                                <tr>
+                                    <td
+                                        class="w-75"
+                                        id="fileName_#{index}">
+                                        <button
+                                            jsf:action="#{AktuelleSchritteForm.myPlugin.downloadFile(file.toString())}">
+                                            <span class="fa fa-file"></span>
+                                            <span>
+                                                <h:outputText
+                                                        value="#{file.fileName}"
+                                                        title="#{file.fileName}" />
+                                            </span>
+                                        </button>
+                                    </td>
+                                    <td class="w-25">
+                                        <h:outputText
+                                            value="#{AktuelleSchritteForm.myPlugin.getFileSize(file.toString())}"
+                                            title="#{AktuelleSchritteForm.myPlugin.getFileSize(file)}" />
+                                    </td>
+                                </tr>
+                            </ui:repeat>
+                        </table>
+                    </div>
+                </ui:repeat>
+            </h:form>
+        </intranda:box>
+    </ui:fragment>
+
+</ui:composition>
