@@ -145,6 +145,7 @@ public class DisplayMetadataPlugin implements IStepPluginVersion2 {
                 metadataTypes.add(key);
             }
         }
+        run();
     }
 
     @Override
