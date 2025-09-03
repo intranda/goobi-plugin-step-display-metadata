@@ -26,6 +26,9 @@ package de.intranda.goobi.plugins;
  * exception statement from your version.
  */
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,20 +36,28 @@ import java.util.Map;
 
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
-import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
-import org.apache.commons.configuration.tree.xpath.XPathExpressionEngine;
-import org.apache.log4j.Logger;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.goobi.beans.Process;
 import org.goobi.beans.Step;
 import org.goobi.production.enums.PluginGuiType;
+import org.goobi.production.enums.PluginReturnValue;
 import org.goobi.production.enums.PluginType;
 import org.goobi.production.enums.StepReturnValue;
-import org.goobi.production.plugin.interfaces.IPlugin;
-import org.goobi.production.plugin.interfaces.IStepPlugin;
+import org.goobi.production.plugin.interfaces.IStepPluginVersion2;
 
 import de.sub.goobi.config.ConfigPlugins;
+import de.sub.goobi.helper.FacesContextHelper;
+import de.sub.goobi.helper.FilesystemHelper;
+import de.sub.goobi.helper.NIOFileUtils;
+import de.sub.goobi.helper.StorageProvider;
+import de.sub.goobi.helper.VariableReplacer;
 import de.sub.goobi.helper.exceptions.SwapException;
+import jakarta.faces.context.ExternalContext;
+import jakarta.faces.context.FacesContext;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import ugh.dl.DocStruct;
 import ugh.dl.Fileformat;
@@ -57,124 +68,84 @@ import ugh.exceptions.PreferencesException;
 import ugh.exceptions.ReadException;
 
 @PluginImplementation
-public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
+@Log4j2
+public class DisplayMetadataPlugin implements IStepPluginVersion2 {
 
-    private static final long serialVersionUID = 8219186039584057484L;
+    private static final long serialVersionUID = 6547730934739285127L;
 
-    private static final String PLUGIN_NAME = "intranda_step_displayMetadata";
-
-    private static final Logger logger = Logger.getLogger(DisplayMetadataPlugin.class);
-
-    @Override
-    public PluginType getType() {
-        return PluginType.Step;
-    }
-
+    @Getter
+    private String title = "intranda_step_displayMetadata";
+    @Getter
     private Step step;
-    private String returnPath;
-    private Process process;
-    private List<String> metadataTypes = new ArrayList<>();
-    private transient List<MetadataConfiguration> metadata = new ArrayList<>();
 
+    private Process process;
+
+    private String returnPath;
+
+    @Getter
+    private List<String> metadataTypes = new ArrayList<>();
+
+    @Setter
+    @Getter
     private Map<String, String> metadataMap = new HashMap<>();
 
-    @Override
-    public String getTitle() {
-        return PLUGIN_NAME;
-    }
+    @Getter
+    private transient List<FolderConfiguration> configuredFolder = new ArrayList<>();
+
+    @Getter
+    private transient List<MetadataConfiguration> metadata = new ArrayList<>();
+
+    @Getter
+    private transient boolean displayMetadata;
+
+    @Getter
+    private transient boolean displayContent;
 
     @Override
     public void initialize(Step step, String returnPath) {
-        String projectName = step.getProzess().getProjekt().getTitel();
-
-        XMLConfiguration xmlConfig = ConfigPlugins.getPluginConfig(PLUGIN_NAME);
-        xmlConfig.setExpressionEngine(new XPathExpressionEngine());
-        xmlConfig.setReloadingStrategy(new FileChangedReloadingStrategy());
-        SubnodeConfiguration myconfig = null;
-
-        // order of configuration is:
-        // 1.) project name and step name matches
-        // 2.) step name matches and project is *
-        // 3.) project name matches and step name is *
-        // 4.) project name and step name are *
-        try {
-            myconfig = xmlConfig.configurationAt("//config[./project = '" + projectName + "'][./step = '" + step.getTitel() + "']");
-        } catch (IllegalArgumentException e) {
-            try {
-                myconfig = xmlConfig.configurationAt("//config[./project = '*'][./step = '" + step.getTitel() + "']");
-            } catch (IllegalArgumentException e1) {
-                try {
-                    myconfig = xmlConfig.configurationAt("//config[./project = '" + projectName + "'][./step = '*']");
-                } catch (IllegalArgumentException e2) {
-                    myconfig = xmlConfig.configurationAt("//config[./project = '*'][./step = '*']");
-                }
-            }
-        }
-
-        List<HierarchicalConfiguration> metadataConfiguration = myconfig.configurationsAt("/metadatalist/metadata");
-        for (HierarchicalConfiguration sub : metadataConfiguration) {
-            String metadataName = sub.getString(".");
-            String prefix = sub.getString("./@prefix", "");
-            String suffix = sub.getString("./@suffix", "");
-            String key = sub.getString("./@key", metadataName);
-            metadata.add(new MetadataConfiguration(metadataName, prefix, suffix, key));
-            metadataTypes.add(key);
-        }
-
-        this.step = step;
         this.returnPath = returnPath;
+        this.step = step;
         process = step.getProzess();
-        execute();
-    }
+        VariableReplacer replacer = new VariableReplacer(null, null, process, step);
 
-    @Override
-    public boolean execute() {
-        try {
-            Fileformat ff = process.readMetadataFile();
-            DocStruct logical = ff.getDigitalDocument().getLogicalDocStruct();
-            if (logical.getType().isAnchor()) {
-                logical = logical.getAllChildren().get(0);
-            }
+        // read parameters from correct block in configuration file
+        SubnodeConfiguration myconfig = ConfigPlugins.getProjectAndStepConfig(title, step);
 
-            for (MetadataConfiguration currentMetadata : metadata) {
+        displayContent = myconfig.getBoolean("/folderlist/@displayContent", false);
+        if (displayContent) {
+            for (HierarchicalConfiguration hc : myconfig.configurationsAt("/folderlist/folder")) {
+                // get foldername, get filter
 
-                MetadataType mdt = process.getRegelsatz().getPreferences().getMetadataTypeByName(currentMetadata.getMetadataName());
-                String values = "";
-                if (mdt != null) {
-                    if (mdt.getIsPerson()) {
-                        List<? extends Person> pdl = logical.getAllPersonsByType(mdt);
-                        if (pdl != null && !pdl.isEmpty()) {
-                            for (Person p : pdl) {
-                                if (!values.isEmpty()) {
-                                    values = values + "; ";
-                                }
-                                values = values + p.getDisplayname();
+                String foldername = hc.getString("@label");
+                Path folderPath = Paths.get(replacer.replace(hc.getString("@path")));
+                String filter = hc.getString("@filter", "");
 
-                            }
-                        }
+                FolderConfiguration fc = new FolderConfiguration(foldername, folderPath, filter);
+                configuredFolder.add(fc);
+                // find all files in folder, use filter
 
-                    } else {
-                        List<? extends Metadata> mdl = logical.getAllMetadataByType(mdt);
-                        if (mdl != null && !mdl.isEmpty()) {
-                            for (Metadata md : mdl) {
-                                if (!values.isEmpty()) {
-                                    values = values + "; ";
-                                }
-                                values = values + md.getValue();
-                            }
-
+                if (StorageProvider.getInstance().isDirectory(folderPath)) {
+                    List<Path> content = StorageProvider.getInstance().listFiles(folderPath.toString());
+                    for (Path file : content) {
+                        if (StringUtils.isBlank(filter) || file.getFileName().toString().matches(filter)) {
+                            fc.addFile(file);
                         }
                     }
-                    metadataMap.put(currentMetadata.getKey(), currentMetadata.getPrefix() + values + currentMetadata.getSuffix());
                 }
             }
-
-        } catch (ReadException | PreferencesException | SwapException | IOException e) {
-            logger.error(e);
-            return false;
         }
-
-        return true;
+        displayMetadata = myconfig.getBoolean("/metadatalist/@displayMetadata", true);
+        if (displayMetadata) {
+            for (HierarchicalConfiguration hc : myconfig.configurationsAt("/metadatalist/metadata")) {
+                String metadataName = hc.getString(".");
+                String prefix = hc.getString("./@prefix", "");
+                String suffix = hc.getString("./@suffix", "");
+                String key = hc.getString("./@key", metadataName);
+                metadata.add(new MetadataConfiguration(metadataName, prefix, suffix, key));
+                metadataTypes.add(key);
+            }
+        }
+        run();
     }
 
     @Override
@@ -193,13 +164,13 @@ public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
     }
 
     @Override
-    public Step getStep() {
-        return step;
+    public PluginGuiType getPluginGuiType() {
+        return PluginGuiType.PART;
     }
 
     @Override
-    public PluginGuiType getPluginGuiType() {
-        return PluginGuiType.PART;
+    public PluginType getType() {
+        return PluginType.Step;
     }
 
     @Override
@@ -207,15 +178,107 @@ public class DisplayMetadataPlugin implements IStepPlugin, IPlugin {
         return "/uii/step_example_full.xhtml";
     }
 
-    public Map<String, String> getMetadataMap() {
-        return metadataMap;
+    @Override
+    public int getInterfaceVersion() {
+        return 0;
     }
 
-    public void setMetadataMap(Map<String, String> metadataMap) {
-        this.metadataMap = metadataMap;
+    @Override
+    public boolean execute() {
+        PluginReturnValue ret = run();
+        return ret != PluginReturnValue.ERROR;
     }
 
-    public List<String> getMetadataTypes() {
-        return metadataTypes;
+    @Override
+    public PluginReturnValue run() {
+        if (displayMetadata) {
+            try {
+                Fileformat ff = process.readMetadataFile();
+                DocStruct logical = ff.getDigitalDocument().getLogicalDocStruct();
+                if (logical.getType().isAnchor()) {
+                    logical = logical.getAllChildren().get(0);
+                }
+
+                for (MetadataConfiguration currentMetadata : metadata) {
+
+                    MetadataType mdt = process.getRegelsatz().getPreferences().getMetadataTypeByName(currentMetadata.getMetadataName());
+                    String values = "";
+                    if (mdt != null) {
+                        if (mdt.getIsPerson()) {
+                            List<? extends Person> pdl = logical.getAllPersonsByType(mdt);
+                            if (pdl != null && !pdl.isEmpty()) {
+                                for (Person p : pdl) {
+                                    if (!values.isEmpty()) {
+                                        values = values + "; ";
+                                    }
+                                    values = values + p.getDisplayname();
+
+                                }
+                            }
+
+                        } else {
+                            List<? extends Metadata> mdl = logical.getAllMetadataByType(mdt);
+                            if (mdl != null && !mdl.isEmpty()) {
+                                for (Metadata md : mdl) {
+                                    if (!values.isEmpty()) {
+                                        values = values + "; ";
+                                    }
+                                    values = values + md.getValue();
+                                }
+
+                            }
+                        }
+                        metadataMap.put(currentMetadata.getKey(), currentMetadata.getPrefix() + values + currentMetadata.getSuffix());
+                    }
+                }
+
+            } catch (ReadException | PreferencesException | SwapException | IOException e) {
+                log.error(e);
+                return PluginReturnValue.ERROR;
+            }
+            log.info("DisplayContent step plugin executed");
+        }
+
+        if (!displayContent && !displayMetadata) {
+            log.error("Nothing configured for display");
+            return PluginReturnValue.ERROR;
+        }
+
+        return PluginReturnValue.FINISH;
+    }
+
+    /**
+     * get the size of a file that is listed inside of the configured directory
+     * 
+     * @param file name of the file to get the size of
+     * @return size as String in MB, GB or TB
+     */
+    public String getFileSize(String file) {
+        String result = "-";
+        try {
+            long fileSize = StorageProvider.getInstance().getFileSize(Paths.get(file));
+            result = FilesystemHelper.getFileSizeShort(fileSize);
+        } catch (IOException e) {
+            log.error(e);
+        }
+        return result;
+    }
+
+    public void downloadFile(String file) {
+        Path f = Paths.get(file);
+        try (InputStream in = StorageProvider.getInstance().newInputStream(f)) {
+            FacesContext facesContext = FacesContextHelper.getCurrentFacesContext();
+            ExternalContext ec = facesContext.getExternalContext();
+            ec.responseReset();
+            ec.setResponseContentType(NIOFileUtils.getMimeTypeFromFile(f));
+            ec.setResponseHeader("Content-Disposition", "attachment; filename=" + f.getFileName().toString());
+            ec.setResponseContentLength((int) StorageProvider.getInstance().getFileSize(f));
+
+            IOUtils.copy(in, ec.getResponseOutputStream());
+
+            facesContext.responseComplete();
+        } catch (IOException e) {
+            log.error(e);
+        }
     }
 }

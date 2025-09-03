@@ -1,21 +1,30 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <config_plugin>
-   <!--
+    <!--
         order of configuration is:
           1.) project name and step name matches
           2.) step name matches and project is *
           3.) project name matches and step name is *
           4.) project name and step name are *
--->
+    -->
+    
     <config>
         <!-- which projects to use for (can be more then one, otherwise use *) -->
         <project>*</project>
         <step>*</step>
-        <metadatalist>
+
+        <folderlist displayContents="false">
+            <folder label="Thesis" path="(folder.media)" filter=".*pdf" />
+            <folder label="Plagiatsprüfungsprotokoll" path="(folder.media)" filter=".*pdf" />
+            <folder label="Sperrbescheid" path="{folder.media}" filter=".*pdf" />
+            <folder label="Beilagen" path="{folder.attachments}" />
+        </folderlist>
+
+        <metadatalist displayMetadata="true">
             <metadata>Author</metadata>
             <metadata>TitleDocMain</metadata>
             <metadata>_urn</metadata>
             <metadata prefix="http://svdmzgoobiweb01.klassik-stiftung.de/viewer/image/" suffix="/1/" key="url">CatalogIDDigital</metadata>
         </metadatalist>
     </config>
+
 </config_plugin>
