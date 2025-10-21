@@ -3,6 +3,10 @@ title: Anzeige von Metadaten und Ordnerinhalten in einer Aufgabe
 identifier: intranda_step_displayMetadata
 published: true
 description: Dies ist die technische Dokumentation für das Goobi-Plugin für die Anzeige von beliebigen Metadaten und Ordnerinhalten in einer Workflow-Aufgabe
+keywords:
+    - Goobi workflow
+    - Plugin
+    - Step Plugin
 ---
 ## Einführung
 Die vorliegende Dokumentation beschreibt die Installation, Konfiguration und den Einsatz eines Plugins zur Anzeige von Metadaten und Ordnerinhalten in einem Workflow-Schritt. Das Plugin kann beliebige Metadaten und Ordnerinhalte in einem Schritt anzeigen. Die Konfiguration von Prä- und Suffixen für die angezeigten Metadaten ist auch möglich.
