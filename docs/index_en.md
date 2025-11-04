@@ -3,6 +3,10 @@ title: Display of metadata and folder contents in a task
 identifier: intranda_step_displayMetadata
 published: true
 description: This is the technical documentation for the Goobi plug-in for displaying any metadata and folder contents in a workflow task.
+keywords:
+    - Goobi workflow
+    - Plugin
+    - Step Plugin
 ---
 ## Introduction
 ‌This documentation describes the installation, configuration and use of a plug-in to display metadata and folder contents in a workflow step. The plugin can display any metadata and folder contents in one step. The configuration of prefixes and suffixes is also possible.
