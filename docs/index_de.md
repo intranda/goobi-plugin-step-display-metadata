@@ -65,6 +65,6 @@ In `metadatalist` können mehrere Metadaten zur Anzeige konfiguriert werden, zus
 
 ### Ordnerinhalte
 In `folderlist` können mehrere Ordner konfiguriert werden, deren Inhalte zum Download aufgelistet werden. Damit die Anzeige generiert wird, muss das `displayContents`-Attribut auf `true` gesetzt werden.
-Mit dem `label` Attribut wird ein Anzeigelabel für den Ordner festgelegt. Das `path`-Attribut erwartet einen Ordner im images-Odner der Prozesse, der in der `goobi_config.properties` definiert ist. Der Ordner, der in der `goobi_config.properties` mit `process.folder.images.attachments={processtitle}_attachments` definiert wurde, wird hier für das Variablensystem als `{folder.attachments}` angegeben.  
-Mit dem `filter`-Attribut kann eine Muster angegeben werden, nach dem die anzuzeigenden Dateien gefiltert werden, bspw. Dateinamen.
+Mit dem `label` Attribut wird ein Anzeigelabel für den Ordner festgelegt. Das `path`-Attribut erwartet einen Ordner im images-Ordner der Prozesse, der in der `goobi_config.properties` definiert ist. Der Ordner, der in der `goobi_config.properties` mit `process.folder.images.attachments={processtitle}_attachments` definiert wurde, wird hier für das Variablensystem als `{folder.attachments}` angegeben.  
+Mit dem `filter`-Attribut kann ein Muster angegeben werden, nach dem die anzuzeigenden Dateien gefiltert werden, bspw. Dateinamen.
 
