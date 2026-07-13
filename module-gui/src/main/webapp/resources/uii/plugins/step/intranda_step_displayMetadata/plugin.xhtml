@@ -7,13 +7,14 @@
     xmlns:intranda="http://xmlns.jcp.org/jsf/composite/composites"
     xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
     xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+    xmlns:util="http://goobi.io/util"
     xmlns:jsf="http://xmlns.jcp.org/jsf">
 
     <ui:fragment rendered="#{AktuelleSchritteForm.myPlugin.displayMetadata}">
         <intranda:box
             boxType="neutral"
             boxPadding="false"
-            icon="fa-book"
+            icon="book"
             title="#{msgs.metadata}">
             <table class="table table-bordered">
                 <ui:repeat var="item" value="#{AktuelleSchritteForm.myPlugin.metadataTypes}" styleClass="table table-hover table-width">
@@ -34,7 +35,7 @@
         <intranda:box
             boxType="primary"
             boxPadding="true"
-            icon="fa-folder-open"
+            icon="folder-open"
             title="Files">
             <h:form>
                 <ui:repeat
@@ -65,11 +66,10 @@
                                         id="fileName_#{index}">
                                         <button
                                             jsf:action="#{AktuelleSchritteForm.myPlugin.downloadFile(file.toString())}">
-                                            <span class="fa fa-file"></span>
+                                            <util:icon icon="file" />
                                             <span>
                                                 <h:outputText
-                                                        value="#{file.fileName}"
-                                                        title="#{file.fileName}" />
+                                                        value="#{file.fileName}" />
                                             </span>
                                         </button>
                                     </td>
